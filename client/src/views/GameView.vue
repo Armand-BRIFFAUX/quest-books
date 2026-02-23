@@ -1,42 +1,67 @@
 <template>
-  <div v-if="chapter">
-    <h1>{{ chapter.title }}</h1>
-    <p>{{ chapter.text }}</p>
-    <button v-for="choice in chapter.choices" :key="choice.id"  @click="loadChapter(choice.nextChapterId)">
-  {{ choice.text }}
-</button>
+  <div v-if="gameStore.chapter">
+    <HealthBar />
+    <h1>{{ gameStore.chapter.title }}</h1>
+    <p>{{ gameStore.chapter.text }}</p>
 
- <div v-if="chapter.type === 'victory'">
-  <p>Victoire !!!</p>
-  <button @click="loadChapter(1)">Recommencer</button>
-  </div>
-  
-  <div v-else-if="chapter.type === 'defeat'">
-  <p>Défaite ...</p>
-  <button @click="loadChapter(1)">Recommencer</button>
-  </div>
+    <!-- Cas 1 : combat en cours -->
+    <div v-if="gameStore.isFighting">
+      <CombatPanel />
+    </div>
 
+    <!-- Cas 2 : combat gagné, on affiche les choix de victoire -->
+    <div v-else-if="gameStore.chapter.type === 'combat' && !gameStore.isFighting">
+      <p><strong>⚔️ Victoire !</strong></p>
+
+      <!-- Afficher le journal de combat -->
+      <p v-for="(message, index) in gameStore.combatLog" :key="index">
+        {{ message }}
+      </p>
+
+      <p>{{ gameStore.chapter.onVictory.text }}</p>
+      <button
+        v-for="choice in gameStore.chapter.onVictory.choices"
+        :key="choice.id"
+        @click="gameStore.loadChapter(choice.nextChapterId)"
+      >
+        {{ choice.text }}
+      </button>
+    </div>
+
+    <div v-else>
+      <button
+        v-for="choice in gameStore.chapter.choices"
+        :key="choice.id"
+        @click="gameStore.loadChapter(choice.nextChapterId)"
+      >
+        {{ choice.text }}
+      </button>
+    </div>
+
+    <div v-if="gameStore.chapter.type === 'victory'">
+      <p>Victoire !!!</p>
+      <button @click="gameStore.loadChapter(1)">Recommencer</button>
+    </div>
+
+    <div v-else-if="gameStore.chapter.type === 'defeat'">
+      <p>Défaite ...</p>
+      <button @click="gameStore.loadChapter(1)">Recommencer</button>
+    </div>
   </div>
 
   <p v-else>Chargement...</p>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
+import { useGameStore } from '@/stores/gameStore'
 
-const chapter = ref(null);
+import HealthBar from '@/components/HealthBar.vue'
+import CombatPanel from '@/components/CombatPanel.vue'
 
-const loadChapter = async (id) => {
-  try {
-    const response = await fetch(`http://localhost:3000/api/chapters/${id}`)
-    const data = await response.json()
-    chapter.value = data
-  } catch (error) {
-    console.error('Erreur lors du chargement :', error)
-  }
-}
+const gameStore = useGameStore()
 
 onMounted(() => {
-  loadChapter(1)
+  gameStore.loadChapter(1)
 })
 </script>

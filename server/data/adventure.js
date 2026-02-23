@@ -41,19 +41,29 @@ export const chapters = [
   {
     id: 4,
     title: "Le combat sous les arbres",
-    text: "Vous dégainez votre épée dans un éclair d'acier. Le loup bondit vers vous avec une rapidité terrifiante. Vous esquivez de justesse et parvenez à lui entailler le flanc. La bête hurle et attaque de nouveau. Après un échange brutal, vous trouvez une ouverture et portez un coup décisif. Le loup s'effondre. Derrière lui, dissimulé dans les fourrés, vous découvrez un ancien médaillon gravé d'un symbole étrange.",
-    choices: [
-      {
-        id: 7,
-        text: "Prendre le médaillon et continuer dans la forêt",
-        nextChapterId: 8,
-      },
-      {
-        id: 8,
-        text: "Ignorer le médaillon et rebrousser chemin",
-        nextChapterId: 5,
-      },
-    ],
+    text: "Le loup bondit vers vous, babines retroussées. Vous dégainez votre épée. Il va falloir vous battre !",
+    type: "combat",
+    enemy: {
+      name: "Loup de Sombrebois",
+      hp: 12,
+      attack: 4,
+      defense: 2,
+    },
+    onVictory: {
+      text: "Le loup s'effondre. Derrière lui, vous découvrez un ancien médaillon gravé d'un symbole étrange.",
+      choices: [
+        { id: 7, text: "Prendre le médaillon et continuer", nextChapterId: 8 },
+        {
+          id: 8,
+          text: "Ignorer le médaillon et rebrousser chemin",
+          nextChapterId: 5,
+        },
+      ],
+    },
+    onDefeat: {
+      text: "Le loup est trop puissant. Vous tombez à genoux, vaincu...",
+      nextChapterId: 5,
+    },
   },
   {
     id: 5,
