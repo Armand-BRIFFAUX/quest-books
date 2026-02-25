@@ -50,12 +50,12 @@ export const chapters = [
       defense: 2,
     },
     onVictory: {
-      text: "Le loup s'effondre. Derrière lui, vous découvrez un ancien médaillon gravé d'un symbole étrange.",
+      text: "Le loup s'effondre. Derrière lui, vous découvrez un ancien médaillon gravé d'un symbole étrange. Mais soudain, le sol tremble. Une silhouette massive se détache entre les arbres...",
       choices: [
-        { id: 7, text: "Prendre le médaillon et continuer", nextChapterId: 8 },
+        { id: 7, text: "Examiner la silhouette", nextChapterId: 9 },
         {
           id: 8,
-          text: "Ignorer le médaillon et rebrousser chemin",
+          text: "Prendre le médaillon et fuir vers la rivière",
           nextChapterId: 5,
         },
       ],
@@ -92,6 +92,33 @@ export const chapters = [
     id: 8,
     title: "Le secret de Sombrebois",
     text: "À peine avez-vous prononcé le mot « feu » que le vieil homme éclate de rire. Son apparence se dissipe comme une illusion. Le médaillon que vous portez (ou la sagesse dont vous avez fait preuve) brille d'une lumière chaude. La grotte s'ouvre derrière le pont, révélant un ancien trésor oublié. Vous avez percé le secret de Sombrebois et triomphez là où tant d'autres ont échoué.",
+    type: "victory",
+    choices: [],
+  },
+  {
+    id: 9,
+    title: "Le Gardien d’Ombre",
+    text: "Une créature immense faite d’écorce, de racines et d’ombre émerge de la forêt. Ses yeux brillent d’une lumière verte surnaturelle. Une voix grave résonne dans votre esprit : « Nul ne profanera la crypte du Roi Oublié. » Le Gardien d’Ombre attaque !",
+    type: "combat",
+    enemy: {
+      name: "Gardien d’Ombre",
+      hp: 18,
+      attack: 6,
+      defense: 3,
+    },
+    onVictory: {
+      text: "Dans un dernier rugissement, le Gardien se fissure et s'effondre en poussière. Sous ses racines, une lourde porte de pierre apparaît — l'entrée véritable de la crypte.",
+      choices: [{ id: 11, text: "Entrer dans la crypte", nextChapterId: 10 }],
+    },
+    onDefeat: {
+      text: "Les racines s'enroulent autour de vous et vous écrasent lentement. La forêt reprend son silence…",
+      nextChapterId: 5,
+    },
+  },
+  {
+    id: 10,
+    title: "La Crypte du Roi Oublié",
+    text: "Vous poussez la porte de pierre dans un grincement sinistre. À l'intérieur, un trône d'or massif repose au centre d'une salle circulaire. Sur celui-ci, un squelette couronné tient une épée ancienne. Vous comprenez que vous êtes le premier à parvenir jusqu'ici depuis des siècles. Le trésor du roi oublié est à vous.",
     type: "victory",
     choices: [],
   },
