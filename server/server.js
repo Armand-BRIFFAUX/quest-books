@@ -4,7 +4,6 @@ import router from "./routes/adventureRoutes.js";
 import sequelize from "./config/database.js";
 
 // import des models
-import User from "./models/User.js";
 import authRouter from "./routes/authRoutes.js";
 
 const app = express();
