@@ -92,6 +92,51 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
+  const saveGame = async () => {
+    const token = localStorage.getItem('token')
+
+    try {
+      const response = await fetch('http://localhost:3000/api/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          chapterId: chapter.value.id,
+          playerHp: playerHp.value,
+        }),
+      })
+      const data = await response.json()
+
+      if (response.ok) {
+        alert('Partie sauvegardée !')
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const loadGame = async () => {
+    const token = localStorage.getItem('token')
+
+    try {
+      const response = await fetch('http://localhost:3000/api/save', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      const data = await response.json()
+
+      if (response.ok) {
+        await loadChapter(data.chapterId)
+        playerHp.value = data.playerHp
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   const resetGame = () => {
     playerHp.value = playerMaxHp.value
     isFighting.value = false
@@ -114,5 +159,7 @@ export const useGameStore = defineStore('game', () => {
     startCombat,
     attack,
     resetGame,
+    saveGame,
+    loadGame,
   }
 })

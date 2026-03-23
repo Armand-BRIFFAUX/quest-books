@@ -1,6 +1,8 @@
 <template>
   <div v-if="gameStore.chapter">
     <HealthBar />
+    <button v-if="isLoggedIn" @click="gameStore.saveGame()">💾 Sauvegarder</button>
+    <button v-if="isLoggedIn" @click="gameStore.loadGame()">📂 Charger ma partie</button>
     <h1>{{ gameStore.chapter.title }}</h1>
     <p>{{ gameStore.chapter.text }}</p>
 
@@ -53,6 +55,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { onMounted } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 
@@ -60,6 +63,10 @@ import HealthBar from '@/components/HealthBar.vue'
 import CombatPanel from '@/components/CombatPanel.vue'
 
 const gameStore = useGameStore()
+
+const isLoggedIn = computed(() => {
+  return localStorage.getItem('token') !== null
+})
 
 onMounted(() => {
   gameStore.loadChapter(1)

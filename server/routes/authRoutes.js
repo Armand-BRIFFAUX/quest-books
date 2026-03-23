@@ -35,6 +35,12 @@ router.post(
         return res.status(409).json({ error: "Email déjà utilisé" });
       }
 
+      const existingUsername = await User.findOne({ where: { username } });
+
+      if (existingUsername) {
+        return res.status(409).json({ error: "Ce pseudo est déjà pris" });
+      }
+
       const hash = await argon2.hash(password);
 
       await User.create({
