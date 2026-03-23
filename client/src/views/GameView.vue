@@ -38,12 +38,20 @@
 
         <div class="choices-container">
           <button
-            v-for="choice in gameStore.chapter.onVictory.choices"
+            v-for="choice in availableVictoryChoices"
             :key="choice.id"
             class="btn-choice"
             @click="gameStore.loadChapter(choice.nextChapterId)"
           >
             {{ choice.text }}
+          </button>
+        </div>
+
+        <!-- Impasse après victoire -->
+        <div v-if="availableVictoryChoices.length === 0">
+          <p class="narrative-text">Vous avez déjà exploré tous les chemins...</p>
+          <button class="btn btn-gold" @click="gameStore.loadChapter(1)">
+            Recommencer l'aventure
           </button>
         </div>
       </div>
@@ -52,12 +60,20 @@
       <div v-else>
         <div class="choices-container">
           <button
-            v-for="choice in gameStore.chapter.choices"
+            v-for="choice in availableChoices"
             :key="choice.id"
             class="btn-choice"
             @click="gameStore.loadChapter(choice.nextChapterId)"
           >
             {{ choice.text }}
+          </button>
+        </div>
+
+        <!-- Impasse : tous les chemins ont été explorés -->
+        <div v-if="availableChoices.length === 0 && gameStore.chapter.choices.length > 0">
+          <p class="narrative-text">Vous avez déjà exploré tous les chemins...</p>
+          <button class="btn btn-gold" @click="gameStore.loadChapter(1)">
+            Recommencer l'aventure
           </button>
         </div>
       </div>
@@ -100,6 +116,20 @@ const gameStore = useGameStore()
 
 const isLoggedIn = computed(() => {
   return localStorage.getItem('token') !== null
+})
+
+const availableChoices = computed(() => {
+  if (!gameStore.chapter || !gameStore.chapter.choices) return []
+  return gameStore.chapter.choices.filter(
+    (choice) => !gameStore.visitedChapters.includes(choice.nextChapterId),
+  )
+})
+
+const availableVictoryChoices = computed(() => {
+  if (!gameStore.chapter || !gameStore.chapter.onVictory) return []
+  return gameStore.chapter.onVictory.choices.filter(
+    (choice) => !gameStore.visitedChapters.includes(choice.nextChapterId),
+  )
 })
 
 onMounted(() => {

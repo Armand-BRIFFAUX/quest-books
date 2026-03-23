@@ -41,6 +41,11 @@ const Save = sequelize.define("Save", {
     allowNull: false,
     defaultValue: '{"weapon":null,"armor":null}',
   },
+  visitedChapters: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+    defaultValue: "[]",
+  },
 });
 
 export default Save;

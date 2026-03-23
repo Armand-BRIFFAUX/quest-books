@@ -4,6 +4,8 @@ import { ref } from 'vue'
 export const useGameStore = defineStore('game', () => {
   // tes variables réactives ici (comme des ref)
 
+  const visitedChapters = ref([])
+
   const inventory = ref([]) // les objets dans le sac
   const equipment = ref({
     weapon: null, // emplacement arme
@@ -32,13 +34,21 @@ export const useGameStore = defineStore('game', () => {
       const response = await fetch(`http://localhost:3000/api/chapters/${id}`)
       const data = await response.json()
       chapter.value = data
-      // Récupérer le loot du chapitre
-      if (data.loot && data.loot.length > 0) {
-        for (const itemId of data.loot) {
-          const itemResponse = await fetch(`http://localhost:3000/api/items/${itemId}`)
-          const item = await itemResponse.json()
-          addItem(item)
+
+      // Récupérer le loot SEULEMENT si le chapitre n'a pas déjà été visité
+      if (!visitedChapters.value.includes(data.id)) {
+        if (data.loot && data.loot.length > 0) {
+          for (const itemId of data.loot) {
+            const itemResponse = await fetch(`http://localhost:3000/api/items/${itemId}`)
+            const item = await itemResponse.json()
+            addItem(item)
+          }
         }
+      }
+
+      // Marquer le chapitre comme visité SEULEMENT si c'est un combat ou un loot
+      if (data.type === 'combat' || (data.loot && data.loot.length > 0)) {
+        visitedChapters.value.push(data.id)
       }
 
       if (id === 1) {
@@ -100,8 +110,12 @@ export const useGameStore = defineStore('game', () => {
       isFighting.value = false
       combatLog.value.push(`Vous avez vaincu ${chapter.value.enemy.name} !`)
 
-      // Récupérer le loot de la victoire
-      if (chapter.value.onVictory.loot) {
+      // Récupérer le loot de la victoire (une seule fois)
+      if (
+        chapter.value.onVictory.loot &&
+        !visitedChapters.value.includes('victory-' + chapter.value.id)
+      ) {
+        visitedChapters.value.push('victory-' + chapter.value.id)
         for (const itemId of chapter.value.onVictory.loot) {
           fetch(`http://localhost:3000/api/items/${itemId}`)
             .then((res) => res.json())
@@ -136,6 +150,7 @@ export const useGameStore = defineStore('game', () => {
           playerDefense: playerDefense.value,
           inventory: JSON.stringify(inventory.value),
           equipment: JSON.stringify(equipment.value),
+          visitedChapters: JSON.stringify(visitedChapters.value),
         }),
       })
       const data = await response.json()
@@ -166,6 +181,7 @@ export const useGameStore = defineStore('game', () => {
         playerDefense.value = data.playerDefense
         inventory.value = JSON.parse(data.inventory)
         equipment.value = JSON.parse(data.equipment)
+        visitedChapters.value = JSON.parse(data.visitedChapters)
 
         if (data.isFighting === false && chapter.value.type === 'combat') {
           isFighting.value = false
@@ -217,6 +233,7 @@ export const useGameStore = defineStore('game', () => {
     equipment.value.weapon = null
     equipment.value.armor = null
     inventory.value = []
+    visitedChapters.value = []
   }
 
   // retourne tout ce que tu veux rendre accessible
@@ -240,5 +257,6 @@ export const useGameStore = defineStore('game', () => {
     equipment,
     useItem,
     addItem,
+    visitedChapters,
   }
 })
