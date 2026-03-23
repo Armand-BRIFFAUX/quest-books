@@ -6,11 +6,43 @@ const router = Router();
 
 // Sauvegarder la partie (protégée par auth)
 router.post("/api/save", auth, async (req, res) => {
-  const { chapterId, playerHp } = req.body;
+  const {
+    chapterId,
+    playerHp,
+    isFighting,
+    playerAttack,
+    playerDefense,
+    inventory,
+    equipment,
+  } = req.body;
   const userId = req.userId;
 
   try {
-    await Save.upsert({ userId, chapterId, playerHp });
+    const existingSave = await Save.findOne({ where: { userId } });
+
+    if (existingSave) {
+      await existingSave.update({
+        chapterId,
+        playerHp,
+        isFighting,
+        playerAttack,
+        playerDefense,
+        inventory,
+        equipment,
+      });
+    } else {
+      await Save.create({
+        userId,
+        chapterId,
+        playerHp,
+        isFighting,
+        playerAttack,
+        playerDefense,
+        inventory,
+        equipment,
+      });
+    }
+
     res.status(200).json({ message: "Partie sauvegardée" });
   } catch (error) {
     console.error(error);
@@ -22,14 +54,14 @@ router.post("/api/save", auth, async (req, res) => {
 router.get("/api/save", auth, async (req, res) => {
   const userId = req.userId;
   try {
-    // 1. Chercher la sauvegarde avec req.userId
-    const save = await Save.findOne({ where: { userId } });
+    const save = await Save.findOne({
+      where: { userId },
+      order: [["updatedAt", "DESC"]],
+    });
 
-    // 2. Si elle existe pas → 404
     if (!save) {
       return res.status(404).json({ error: "Partie introuvable" });
     }
-    // 3. Si elle existe → la renvoyer en JSON
     res.status(200).json(save);
   } catch (error) {
     console.error(error);

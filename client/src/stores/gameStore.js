@@ -131,6 +131,11 @@ export const useGameStore = defineStore('game', () => {
         body: JSON.stringify({
           chapterId: chapter.value.id,
           playerHp: playerHp.value,
+          isFighting: isFighting.value,
+          playerAttack: playerAttack.value,
+          playerDefense: playerDefense.value,
+          inventory: JSON.stringify(inventory.value),
+          equipment: JSON.stringify(equipment.value),
         }),
       })
       const data = await response.json()
@@ -157,6 +162,14 @@ export const useGameStore = defineStore('game', () => {
       if (response.ok) {
         await loadChapter(data.chapterId)
         playerHp.value = data.playerHp
+        playerAttack.value = data.playerAttack
+        playerDefense.value = data.playerDefense
+        inventory.value = JSON.parse(data.inventory)
+        equipment.value = JSON.parse(data.equipment)
+
+        if (data.isFighting === false && chapter.value.type === 'combat') {
+          isFighting.value = false
+        }
       }
     } catch (error) {
       console.error(error)
