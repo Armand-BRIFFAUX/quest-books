@@ -1,15 +1,27 @@
 <template>
-  <div class="register_container">
-    <h1 class="register_h1">Login</h1>
-    <form class="register_form" @submit.prevent="handleLogin">
-      <label for="email">Email :</label>
-      <input v-model="email" placeholder="test123@mail.com" type="email" required />
+  <div class="auth-container">
+    <div class="auth-card">
+      <h1 class="auth-title">Connexion</h1>
 
-      <label for="password">Password :</label>
-      <input v-model="password" placeholder="********" type="password" required />
+      <form @submit.prevent="handleLogin">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input v-model="email" placeholder="votre@email.com" type="email" required />
+        </div>
 
-      <button type="submit">Login</button>
-    </form>
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input v-model="password" placeholder="••••••••" type="password" required />
+        </div>
+
+        <button type="submit" class="btn btn-gold form-submit">Se connecter</button>
+      </form>
+
+      <p class="auth-footer">
+        Pas encore de compte ?
+        <RouterLink to="/register">S'inscrire</RouterLink>
+      </p>
+    </div>
   </div>
 </template>
 
@@ -50,7 +62,7 @@ const handleLogin = async () => {
     router.push('/game')
   } catch (error) {
     console.error(error)
-    alert('Erreur')
+    alert('Erreur de connexion')
   }
 }
 </script>

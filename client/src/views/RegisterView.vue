@@ -1,21 +1,37 @@
 <template>
-  <div class="register_container">
-    <h1 class="register_h1">Inscription</h1>
-    <form class="register_form" @submit.prevent="handleRegister">
-      <label for="username">Username</label>
-      <input v-model="username" placeholder="Username" type="text" required />
+  <div class="auth-container">
+    <div class="auth-card">
+      <h1 class="auth-title">Inscription</h1>
 
-      <label for="email">Email :</label>
-      <input v-model="email" placeholder="test123@mail.com" type="email" required />
+      <form @submit.prevent="handleRegister">
+        <div class="form-group">
+          <label for="username">Nom d'aventurier</label>
+          <input v-model="username" placeholder="Votre pseudo" type="text" required />
+        </div>
 
-      <label for="password">Password :</label>
-      <input v-model="password" placeholder="********" type="password" required />
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input v-model="email" placeholder="votre@email.com" type="email" required />
+        </div>
 
-      <label for="confirm_password">Confirm password :</label>
-      <input v-model="confirmPassword" placeholder="********" type="password" required />
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input v-model="password" placeholder="••••••••" type="password" required />
+        </div>
 
-      <button type="submit">S'inscrire</button>
-    </form>
+        <div class="form-group">
+          <label for="confirm_password">Confirmer le mot de passe</label>
+          <input v-model="confirmPassword" placeholder="••••••••" type="password" required />
+        </div>
+
+        <button type="submit" class="btn btn-gold form-submit">Créer mon compte</button>
+      </form>
+
+      <p class="auth-footer">
+        Déjà un compte ?
+        <RouterLink to="/login">Se connecter</RouterLink>
+      </p>
+    </div>
   </div>
 </template>
 

@@ -1,66 +1,100 @@
 <template>
-  <div v-if="gameStore.chapter">
+  <div v-if="gameStore.chapter" class="page-container">
+    <!-- Toolbar : sauvegarder / charger -->
+    <div v-if="isLoggedIn" class="game-toolbar">
+      <button class="btn btn-outline btn-sm" @click="gameStore.saveGame()">💾 Sauvegarder</button>
+      <button class="btn btn-outline btn-sm" @click="gameStore.loadGame()">📂 Charger</button>
+    </div>
+
+    <!-- Barre de vie du joueur -->
     <HealthBar />
-    <button v-if="isLoggedIn" @click="gameStore.saveGame()">💾 Sauvegarder</button>
-    <button v-if="isLoggedIn" @click="gameStore.loadGame()">📂 Charger ma partie</button>
-    <h1>{{ gameStore.chapter.title }}</h1>
-    <p>{{ gameStore.chapter.text }}</p>
+    <!-- Inventaire du joueur -->
+    <Inventory />
 
-    <!-- Cas 1 : combat en cours -->
-    <div v-if="gameStore.isFighting">
-      <CombatPanel />
-    </div>
+    <!-- Chapitre -->
+    <div class="card chapter-card">
+      <h1 class="chapter-title">{{ gameStore.chapter.title }}</h1>
+      <div class="chapter-divider"></div>
+      <p class="narrative-text">{{ gameStore.chapter.text }}</p>
 
-    <!-- Cas 2 : combat gagné, on affiche les choix de victoire -->
-    <div v-else-if="gameStore.chapter.type === 'combat' && !gameStore.isFighting">
-      <p><strong>⚔️ Victoire !</strong></p>
+      <!-- Cas 1 : combat en cours -->
+      <div v-if="gameStore.isFighting">
+        <CombatPanel />
+      </div>
 
-      <!-- Afficher le journal de combat -->
-      <p v-for="(message, index) in gameStore.combatLog" :key="index">
-        {{ message }}
-      </p>
+      <!-- Cas 2 : combat gagné -->
+      <div v-else-if="gameStore.chapter.type === 'combat' && !gameStore.isFighting">
+        <div class="victory-banner">
+          <h2>⚔️ Victoire !</h2>
+        </div>
 
-      <p>{{ gameStore.chapter.onVictory.text }}</p>
-      <button
-        v-for="choice in gameStore.chapter.onVictory.choices"
-        :key="choice.id"
-        @click="gameStore.loadChapter(choice.nextChapterId)"
-      >
-        {{ choice.text }}
-      </button>
-    </div>
+        <div class="combat-log" v-if="gameStore.combatLog.length">
+          <p v-for="(message, index) in gameStore.combatLog" :key="index" class="combat-log-entry">
+            {{ message }}
+          </p>
+        </div>
 
-    <div v-else>
-      <button
-        v-for="choice in gameStore.chapter.choices"
-        :key="choice.id"
-        @click="gameStore.loadChapter(choice.nextChapterId)"
-      >
-        {{ choice.text }}
-      </button>
-    </div>
+        <p class="narrative-text">{{ gameStore.chapter.onVictory.text }}</p>
 
-    <div v-if="gameStore.chapter.type === 'victory'">
-      <p>Victoire !!!</p>
-      <button @click="gameStore.loadChapter(1)">Recommencer</button>
-    </div>
+        <div class="choices-container">
+          <button
+            v-for="choice in gameStore.chapter.onVictory.choices"
+            :key="choice.id"
+            class="btn-choice"
+            @click="gameStore.loadChapter(choice.nextChapterId)"
+          >
+            {{ choice.text }}
+          </button>
+        </div>
+      </div>
 
-    <div v-else-if="gameStore.chapter.type === 'defeat'">
-      <p>Défaite ...</p>
-      <button @click="gameStore.loadChapter(1)">Recommencer</button>
+      <!-- Cas 3 : chapitre normal -->
+      <div v-else>
+        <div class="choices-container">
+          <button
+            v-for="choice in gameStore.chapter.choices"
+            :key="choice.id"
+            class="btn-choice"
+            @click="gameStore.loadChapter(choice.nextChapterId)"
+          >
+            {{ choice.text }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Victoire finale -->
+      <div v-if="gameStore.chapter.type === 'victory'">
+        <div class="victory-banner">
+          <h2>🏆 Victoire !</h2>
+          <p>Vous avez triomphé de Sombrebois !</p>
+        </div>
+        <button class="btn btn-gold" @click="gameStore.loadChapter(1)">
+          Recommencer l'aventure
+        </button>
+      </div>
+
+      <!-- Défaite -->
+      <div v-else-if="gameStore.chapter.type === 'defeat'">
+        <div class="defeat-banner">
+          <h2>💀 Défaite</h2>
+          <p>Votre aventure s'arrête ici...</p>
+        </div>
+        <button class="btn btn-danger" @click="gameStore.loadChapter(1)">
+          Retenter l'aventure
+        </button>
+      </div>
     </div>
   </div>
 
-  <p v-else>Chargement...</p>
+  <p v-else class="loading">Chargement</p>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
-
 import HealthBar from '@/components/HealthBar.vue'
 import CombatPanel from '@/components/CombatPanel.vue'
+import Inventory from '@/components/Inventory.vue'
 
 const gameStore = useGameStore()
 

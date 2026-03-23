@@ -3,6 +3,13 @@ import { ref } from 'vue'
 
 export const useGameStore = defineStore('game', () => {
   // tes variables réactives ici (comme des ref)
+
+  const inventory = ref([]) // les objets dans le sac
+  const equipment = ref({
+    weapon: null, // emplacement arme
+    armor: null, // emplacement amulette/armure
+  })
+
   // stats du joueur
   const chapter = ref(null)
   const playerHp = ref(20)
@@ -25,6 +32,15 @@ export const useGameStore = defineStore('game', () => {
       const response = await fetch(`http://localhost:3000/api/chapters/${id}`)
       const data = await response.json()
       chapter.value = data
+      // Récupérer le loot du chapitre
+      if (data.loot && data.loot.length > 0) {
+        for (const itemId of data.loot) {
+          const itemResponse = await fetch(`http://localhost:3000/api/items/${itemId}`)
+          const item = await itemResponse.json()
+          addItem(item)
+        }
+      }
+
       if (id === 1) {
         resetGame()
       }
@@ -79,12 +95,22 @@ export const useGameStore = defineStore('game', () => {
 
     // 5. Vérifier si le combat est terminé
     // si enemyHp <= 0 → victoire
-    // si playerHp <= 0 → défaite
+
     if (enemyHp.value <= 0) {
       isFighting.value = false
       combatLog.value.push(`Vous avez vaincu ${chapter.value.enemy.name} !`)
-      // On ne fait rien d'autre ici, le template affichera les choix de onVictory
-    } else if (playerHp.value <= 0) {
+
+      // Récupérer le loot de la victoire
+      if (chapter.value.onVictory.loot) {
+        for (const itemId of chapter.value.onVictory.loot) {
+          fetch(`http://localhost:3000/api/items/${itemId}`)
+            .then((res) => res.json())
+            .then((item) => addItem(item))
+        }
+      }
+    }
+    // si playerHp <= 0 → défaite
+    else if (playerHp.value <= 0) {
       isFighting.value = false
       combatLog.value.push(`Vous avez été vaincu...`)
       // On redirige vers le chapitre de défaite
@@ -137,11 +163,47 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
+  const addItem = (item) => {
+    // ajouter l'item dans le tableau inventory
+    inventory.value.push(item)
+  }
+
+  const useItem = (itemId) => {
+    const item = inventory.value.find((i) => i.id === itemId)
+    if (!item) return
+
+    if (item.type === 'potion') {
+      // ajouter item.effect.value aux PV (sans dépasser le max !)
+      playerHp.value = Math.min(playerMaxHp.value, playerHp.value + item.effect.value)
+      // retirer l'objet de l'inventaire
+      inventory.value = inventory.value.filter((i) => i.id !== itemId)
+    }
+
+    if (item.type === 'equipment') {
+      if (item.slot === 'armor') {
+        equipment.value.armor = item
+        playerDefense.value += item.effect.value
+      }
+
+      if (item.slot === 'weapon') {
+        equipment.value.weapon = item
+        playerAttack.value += item.effect.value
+      }
+
+      inventory.value = inventory.value.filter((i) => i.id !== itemId)
+    }
+  }
+
   const resetGame = () => {
     playerHp.value = playerMaxHp.value
+    playerDefense.value = 3 // ← valeur de base
+    playerAttack.value = 5 // ← valeur de base
     isFighting.value = false
     combatLog.value = []
     enemyHp.value = 0
+    equipment.value.weapon = null
+    equipment.value.armor = null
+    inventory.value = []
   }
 
   // retourne tout ce que tu veux rendre accessible
@@ -161,5 +223,9 @@ export const useGameStore = defineStore('game', () => {
     resetGame,
     saveGame,
     loadGame,
+    inventory,
+    equipment,
+    useItem,
+    addItem,
   }
 })

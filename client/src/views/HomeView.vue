@@ -1,17 +1,22 @@
 <template>
-  <div v-if="adventure">
-    <h1>{{ adventure.title }}</h1>
-    <p>{{ adventure.description }}</p>
-    <RouterLink to="/game">Commencer l'aventure</RouterLink>
-  </div>
+  <div class="home-container">
+    <h1 class="home-title">Quest Books</h1>
+    <p class="home-subtitle">Incarnez un héros, faites vos choix, forgez votre destin.</p>
 
-  <p v-else>Chargement...</p>
+    <div v-if="adventure" class="card-parchment home-adventure-card">
+      <h2 class="home-adventure-title">{{ adventure.title }}</h2>
+      <p class="home-adventure-desc">{{ adventure.description }}</p>
+      <RouterLink to="/game" class="btn btn-gold">Commencer l'aventure</RouterLink>
+    </div>
+
+    <p v-else class="loading">Chargement</p>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 
-const adventure = ref(null);
+const adventure = ref(null)
 
 onMounted(async () => {
   try {

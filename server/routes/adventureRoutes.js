@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { adventure, chapters } from "../data/adventure.js";
+import { adventure, chapters, items } from "../data/adventure.js";
 
 const router = Router();
 
@@ -17,6 +17,17 @@ router.get("/api/chapters/:id", (req, res) => {
   }
 
   res.status(200).json(chapter);
+});
+
+router.get("/api/items/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const item = items.find((i) => i.id === id);
+
+  if (!item) {
+    return res.status(404).json({ error: "Objet introuvable" });
+  }
+
+  res.json(item);
 });
 
 export default router;
