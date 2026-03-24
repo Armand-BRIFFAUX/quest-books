@@ -16,6 +16,7 @@ const router = createRouter({
       path: '/game',
       name: 'game',
       component: GameView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/register',
@@ -28,6 +29,12 @@ const router = createRouter({
       component: LoginView,
     },
   ],
+})
+
+router.beforeEach((to) => {
+  if (to.meta.requiresAuth && !localStorage.getItem('token')) {
+    return { name: 'login' }
+  }
 })
 
 export default router

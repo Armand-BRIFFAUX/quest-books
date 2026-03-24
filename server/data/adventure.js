@@ -235,6 +235,11 @@ export const chapters = [
     id: 9,
     title: "Le pont maudit",
     text: "Vous traversez le pont en ignorant les avertissements. À mi-chemin, la pierre se fissure sous vos pas. Le pont cède brutalement ! Vous parvenez de justesse à vous accrocher au rebord. Avec un effort surhumain, vous vous hissez de l'autre côté, mais vous êtes blessé.",
+    trap: {
+      type: "damage",
+      value: 4,
+      message: "Le pont s'effondre sous vos pieds ! Vous perdez 4 points de vie en chutant.",
+    },
     choices: [
       { id: 21, text: "Boiter vers la grotte", nextChapterId: 17 },
       { id: 22, text: "Longer la falaise vers le nord", nextChapterId: 18 },
@@ -254,6 +259,11 @@ export const chapters = [
     id: 11,
     title: "Le nid de serpents",
     text: "Plus profondément dans les fourrés, vous tombez sur un nid de serpents venimeux. L'un d'eux vous mord au mollet avant que vous puissiez réagir. La douleur est vive mais supportable. Vous reculez précipitamment.",
+    trap: {
+      type: "damage",
+      value: 3,
+      message: "Un serpent venimeux vous mord ! Vous perdez 3 points de vie.",
+    },
     choices: [
       {
         id: 25,
@@ -364,6 +374,11 @@ export const chapters = [
     id: 19,
     title: "Le marais empoisonné",
     text: "Le marais est un piège mortel. Chaque pas vous enfonce un peu plus dans la boue. Des vapeurs toxiques s'élèvent de l'eau stagnante. Vous apercevez un tronc d'arbre qui pourrait servir de pont improvisé, mais aussi une créature tapie dans les roseaux.",
+    trap: {
+      type: "damage",
+      value: 5,
+      message: "Les vapeurs toxiques du marais vous empoisonnent ! Vous perdez 5 points de vie.",
+    },
     choices: [
       { id: 43, text: "Traverser sur le tronc d'arbre", nextChapterId: 26 },
       { id: 44, text: "Affronter la créature du marais", nextChapterId: 27 },
@@ -589,6 +604,11 @@ export const chapters = [
     id: 38,
     title: "Le champignon hallucinogène",
     text: "Le champignon a un goût amer. Votre vision se trouble et le monde se déforme. Vous voyez des couleurs impossibles et entendez des voix qui chantent. Quand vous reprenez vos esprits, vous êtes dans une salle que vous ne reconnaissez pas, mais vous vous sentez étrangement revigoré.",
+    trap: {
+      type: "damage",
+      value: 2,
+      message: "Le champignon était toxique ! Vous perdez 2 points de vie avant de reprendre vos esprits.",
+    },
     loot: [5],
     choices: [
       { id: 77, text: "Explorer cette nouvelle salle", nextChapterId: 39 },
@@ -747,6 +767,10 @@ export const chapters = [
     id: 54,
     title: "Les ruelles sombres",
     text: "Les ruelles sont un dédale de passages étroits. Vous entendez des pas derrière vous. Soudain, trois silhouettes encapuchonnées vous bloquent le passage. « Tes affaires ou ta vie, étranger. »",
+    trap: {
+      type: "stealItem",
+      message: "Un pickpocket vous dérobe un objet de votre sac pendant la confrontation !",
+    },
     choices: [
       { id: 104, text: "Se battre", nextChapterId: 59 },
       { id: 105, text: "Négocier", nextChapterId: 60 },
@@ -1178,6 +1202,11 @@ export const chapters = [
     id: 91,
     title: "Le coffre piégé",
     text: "Le coffre s'ouvre et un nuage de gaz empoisonné s'en échappe ! Vous toussez violemment mais à l'intérieur, vous trouvez une armure d'une qualité exceptionnelle.",
+    trap: {
+      type: "damage",
+      value: 6,
+      message: "Un nuage de gaz empoisonné s'échappe du coffre ! Vous perdez 6 points de vie.",
+    },
     loot: [23],
     choices: [
       { id: 170, text: "Rejoindre le couloir des gardiens", nextChapterId: 90 },

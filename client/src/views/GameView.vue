@@ -21,6 +21,13 @@
       <div class="card chapter-card">
         <h1 class="chapter-title">{{ gameStore.chapter.title }}</h1>
         <div class="chapter-divider"></div>
+
+        <!-- Alerte piège -->
+        <div v-if="gameStore.trapMessage" class="trap-banner">
+          <span class="trap-icon">⚠️</span>
+          <p class="trap-text">{{ gameStore.trapMessage }}</p>
+        </div>
+
         <p class="narrative-text">{{ gameStore.chapter.text }}</p>
 
         <!-- Cas 1 : combat en cours -->
@@ -28,8 +35,8 @@
           <CombatPanel />
         </div>
 
-        <!-- Cas 2 : combat gagné -->
-        <div v-else-if="gameStore.chapter.type === 'combat' && !gameStore.isFighting">
+        <!-- Cas 2 : combat gagné (seulement si le joueur est vivant) -->
+        <div v-else-if="gameStore.chapter.type === 'combat' && !gameStore.isFighting && gameStore.playerHp > 0">
           <div class="victory-banner">
             <h2>⚔️ Victoire !</h2>
           </div>
@@ -217,6 +224,36 @@ onMounted(() => {
   height: 2px;
   background: linear-gradient(90deg, var(--color-gold), transparent);
   margin: 1rem 0;
+}
+
+.trap-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  background: linear-gradient(145deg, rgba(192, 57, 43, 0.12) 0%, rgba(192, 57, 43, 0.04) 100%);
+  border: 1px solid rgba(192, 57, 43, 0.3);
+  border-radius: 10px;
+  animation: trapAppear 0.5s ease forwards;
+}
+
+.trap-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.trap-text {
+  color: var(--color-danger-light);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+@keyframes trapAppear {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 .narrative-text {

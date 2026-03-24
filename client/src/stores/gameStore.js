@@ -24,6 +24,7 @@ export const useGameStore = defineStore('game', () => {
   const enemyMaxHp = ref(0)
   const isFighting = ref(false)
   const combatLog = ref([])
+  const trapMessage = ref(null)
 
   // fonction qui choisi au hasard un chiffre entre 1 et 6
   const rollDice = () => Math.floor(Math.random() * 6) + 1
@@ -46,8 +47,27 @@ export const useGameStore = defineStore('game', () => {
         }
       }
 
-      // Marquer le chapitre comme visité SEULEMENT si c'est un combat ou un loot
-      if (data.type === 'combat' || (data.loot && data.loot.length > 0)) {
+      // Gérer les pièges (une seule fois par chapitre)
+      trapMessage.value = null
+      if (data.trap && !visitedChapters.value.includes(data.id)) {
+        if (data.trap.type === 'damage') {
+          playerHp.value = Math.max(0, playerHp.value - data.trap.value)
+        } else if (data.trap.type === 'stealItem') {
+          if (inventory.value.length > 0) {
+            inventory.value.pop()
+          }
+        }
+        trapMessage.value = data.trap.message
+
+        // Mort par piège → défaite
+        if (playerHp.value <= 0) {
+          loadChapter(100)
+          return
+        }
+      }
+
+      // Marquer le chapitre comme visité si combat, loot OU piège
+      if (data.type === 'combat' || (data.loot && data.loot.length > 0) || data.trap) {
         visitedChapters.value.push(data.id)
       }
 
@@ -104,7 +124,7 @@ export const useGameStore = defineStore('game', () => {
       combatLog.value.push(`Vous infligez ${degat} dégâts !`)
     } else {
       degat = Math.max(1, enemyStrength - playerDefense.value)
-      playerHp.value -= degat
+      playerHp.value = Math.max(0, playerHp.value - degat)
       combatLog.value.push(`Vous subissez ${degat} dégâts !`)
     }
 
@@ -124,9 +144,11 @@ export const useGameStore = defineStore('game', () => {
         }
       }
     } else if (playerHp.value <= 0) {
-      isFighting.value = false
       combatLog.value.push(`Vous avez été vaincu...`)
-      loadChapter(chapter.value.onDefeat.nextChapterId)
+      const defeatChapterId = chapter.value.onDefeat.nextChapterId
+      loadChapter(defeatChapterId).then(() => {
+        isFighting.value = false
+      })
     }
   }
 
@@ -239,6 +261,7 @@ export const useGameStore = defineStore('game', () => {
     equipment.value.armor = null
     inventory.value = []
     visitedChapters.value = []
+    trapMessage.value = null
   }
 
   // retourne tout ce que tu veux rendre accessible
@@ -253,6 +276,7 @@ export const useGameStore = defineStore('game', () => {
     enemyMaxHp,
     isFighting,
     combatLog,
+    trapMessage,
     startCombat,
     attack,
     rollAttack,
