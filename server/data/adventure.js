@@ -179,7 +179,7 @@ export const chapters = [
     enemy: {
       name: "Loup de Sombrebois",
       hp: 12,
-      attack: 4,
+      attack: 2,
       defense: 2,
     },
     onVictory: {
@@ -518,7 +518,7 @@ export const chapters = [
     enemy: {
       name: "Golem de pierre",
       hp: 22,
-      attack: 6,
+      attack: 5,
       defense: 5,
     },
     onVictory: {
@@ -990,7 +990,7 @@ export const chapters = [
     enemy: {
       name: "Seigneur des Ombres",
       hp: 28,
-      attack: 8,
+      attack: 7,
       defense: 4,
     },
     onVictory: {

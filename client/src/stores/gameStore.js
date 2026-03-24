@@ -76,41 +76,42 @@ export const useGameStore = defineStore('game', () => {
     combatLog.value = []
   }
 
-  // fonction pour les attaques
-  const attack = () => {
-    // 1. Lancer les dés
-    const playerRoll = rollDice() + rollDice()
-    const enemyRoll = rollDice()
+  // Lance les dés et retourne les résultats (sans appliquer les dégâts)
+  const rollAttack = () => {
+    const playerDice = [rollDice(), rollDice()]
+    const enemyDice = [rollDice(), rollDice()]
+    const playerRoll = playerDice[0] + playerDice[1]
+    const enemyRoll = enemyDice[0] + enemyDice[1]
 
-    // 2. Calculer les forces
+    const playerStrength = playerRoll + playerAttack.value
+    const enemyStrength = enemyRoll + chapter.value.enemy.attack
+    const playerHits = playerStrength >= enemyStrength
+
+    return { playerDice, enemyDice, playerRoll, enemyRoll, playerHits }
+  }
+
+  // Applique les dégâts à partir d'un résultat de rollAttack()
+  const applyAttack = (result) => {
+    const { playerRoll, enemyRoll, playerHits } = result
     const playerStrength = playerRoll + playerAttack.value
     const enemyStrength = enemyRoll + chapter.value.enemy.attack
 
     let degat = 0
 
-    // 3. Comparer et infliger des dégâts
-    if (playerStrength >= enemyStrength) {
-      // le joueur touche → le monstre perd des PV
-      // dégâts = playerStrength - enemy.defense (minimum 1)
+    if (playerHits) {
       degat = Math.max(1, playerStrength - chapter.value.enemy.defense)
-      enemyHp.value -= degat // on soustrait les dégâts des PV
+      enemyHp.value -= degat
       combatLog.value.push(`Vous infligez ${degat} dégâts !`)
     } else {
-      // le monstre touche → le joueur perd des PV
-      // dégâts = enemyStrength - playerDefense (minimum 1)
       degat = Math.max(1, enemyStrength - playerDefense.value)
       playerHp.value -= degat
       combatLog.value.push(`Vous subissez ${degat} dégâts !`)
     }
 
-    // 5. Vérifier si le combat est terminé
-    // si enemyHp <= 0 → victoire
-
     if (enemyHp.value <= 0) {
       isFighting.value = false
       combatLog.value.push(`Vous avez vaincu ${chapter.value.enemy.name} !`)
 
-      // Récupérer le loot de la victoire (une seule fois)
       if (
         chapter.value.onVictory.loot &&
         !visitedChapters.value.includes('victory-' + chapter.value.id)
@@ -122,14 +123,18 @@ export const useGameStore = defineStore('game', () => {
             .then((item) => addItem(item))
         }
       }
-    }
-    // si playerHp <= 0 → défaite
-    else if (playerHp.value <= 0) {
+    } else if (playerHp.value <= 0) {
       isFighting.value = false
       combatLog.value.push(`Vous avez été vaincu...`)
-      // On redirige vers le chapitre de défaite
       loadChapter(chapter.value.onDefeat.nextChapterId)
     }
+  }
+
+  // Raccourci rétrocompatible : lance + applique immédiatement
+  const attack = () => {
+    const result = rollAttack()
+    applyAttack(result)
+    return result
   }
 
   const saveGame = async () => {
@@ -250,6 +255,8 @@ export const useGameStore = defineStore('game', () => {
     combatLog,
     startCombat,
     attack,
+    rollAttack,
+    applyAttack,
     resetGame,
     saveGame,
     loadGame,

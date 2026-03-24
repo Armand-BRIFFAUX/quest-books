@@ -8,6 +8,7 @@
         <span class="slot-label">⚔️ Arme</span>
         <span v-if="gameStore.equipment.weapon" class="slot-item">
           {{ gameStore.equipment.weapon.name }}
+          <span class="slot-bonus bonus-atk">(+{{ gameStore.equipment.weapon.effect.value }} ATK)</span>
         </span>
         <span v-else class="slot-empty">Vide</span>
       </div>
@@ -15,6 +16,7 @@
         <span class="slot-label">🛡️ Armure</span>
         <span v-if="gameStore.equipment.armor" class="slot-item">
           {{ gameStore.equipment.armor.name }}
+          <span class="slot-bonus bonus-def">(+{{ gameStore.equipment.armor.effect.value }} DEF)</span>
         </span>
         <span v-else class="slot-empty">Vide</span>
       </div>
@@ -97,6 +99,20 @@ const gameStore = useGameStore()
   color: var(--color-gold);
   font-size: 0.9rem;
   font-weight: 600;
+}
+
+.slot-bonus {
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-left: 0.25rem;
+}
+
+.bonus-def {
+  color: var(--color-success);
+}
+
+.bonus-atk {
+  color: #e8a030;
 }
 
 .slot-empty {
