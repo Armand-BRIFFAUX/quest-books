@@ -15,6 +15,7 @@ router.post("/api/save", auth, async (req, res) => {
     inventory,
     equipment,
     visitedChapters,
+    startTime,
   } = req.body;
   const userId = req.userId;
 
@@ -31,6 +32,7 @@ router.post("/api/save", auth, async (req, res) => {
         inventory,
         equipment,
         visitedChapters,
+        startTime,
       });
     } else {
       await Save.create({
@@ -43,6 +45,7 @@ router.post("/api/save", auth, async (req, res) => {
         inventory,
         equipment,
         visitedChapters,
+        startTime,
       });
     }
 

@@ -25,6 +25,7 @@ export const useGameStore = defineStore('game', () => {
   const isFighting = ref(false)
   const combatLog = ref([])
   const trapMessage = ref(null)
+  const startTime = ref(null)
 
   // fonction qui choisi au hasard un chiffre entre 1 et 6
   const rollDice = () => Math.floor(Math.random() * 6) + 1
@@ -73,6 +74,10 @@ export const useGameStore = defineStore('game', () => {
 
       if (id === 1) {
         resetGame()
+        startTime.value = Date.now()
+      }
+      if (data.type === 'victory') {
+        submitScore()
       }
       if (data.type === 'combat') {
         startCombat()
@@ -159,6 +164,34 @@ export const useGameStore = defineStore('game', () => {
     return result
   }
 
+  const getTimePlayed = () => {
+    if (!startTime.value) return 0
+    return Math.floor((Date.now() - startTime.value) / 1000)
+  }
+
+  const submitScore = async () => {
+    const token = localStorage.getItem('token')
+    if (!token) return null
+
+    try {
+      const response = await fetch('http://localhost:3000/api/leaderboard', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          playerHp: playerHp.value,
+          timePlayed: getTimePlayed(),
+        }),
+      })
+      return await response.json()
+    } catch (error) {
+      console.error('Erreur leaderboard:', error)
+      return null
+    }
+  }
+
   const saveGame = async () => {
     const token = localStorage.getItem('token')
 
@@ -178,6 +211,7 @@ export const useGameStore = defineStore('game', () => {
           inventory: JSON.stringify(inventory.value),
           equipment: JSON.stringify(equipment.value),
           visitedChapters: JSON.stringify(visitedChapters.value),
+          startTime: startTime.value,
         }),
       })
       const data = await response.json()
@@ -209,6 +243,7 @@ export const useGameStore = defineStore('game', () => {
         inventory.value = JSON.parse(data.inventory)
         equipment.value = JSON.parse(data.equipment)
         visitedChapters.value = JSON.parse(data.visitedChapters)
+        startTime.value = data.startTime ? Number(data.startTime) : Date.now()
 
         if (data.isFighting === false && chapter.value.type === 'combat') {
           isFighting.value = false
@@ -262,6 +297,7 @@ export const useGameStore = defineStore('game', () => {
     inventory.value = []
     visitedChapters.value = []
     trapMessage.value = null
+    startTime.value = null
   }
 
   // retourne tout ce que tu veux rendre accessible
@@ -289,5 +325,8 @@ export const useGameStore = defineStore('game', () => {
     useItem,
     addItem,
     visitedChapters,
+    startTime,
+    getTimePlayed,
+    submitScore,
   }
 })

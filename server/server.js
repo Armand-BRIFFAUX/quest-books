@@ -6,6 +6,7 @@ import sequelize from "./config/database.js";
 // import des models
 import authRouter from "./routes/authRoutes.js";
 import saveRouter from "./routes/saveRoutes.js";
+import leaderboardRouter from "./routes/leaderboardRoutes.js";
 
 const app = express();
 app.use(cors());
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(router);
 app.use(authRouter);
 app.use(saveRouter);
+app.use(leaderboardRouter);
 
 const PORT = process.env.PORT || 3000;
 
@@ -21,7 +23,7 @@ sequelize
   .authenticate()
   .then(() => {
     console.log("Connexion à PostgreSQL réussie !");
-    return sequelize.sync(); // ← crée les tables
+    return sequelize.sync(); // ← crée/met à jour les tables
   })
   .then(() => {
     console.log("Tables synchronisées !");

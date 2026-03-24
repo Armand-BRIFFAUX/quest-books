@@ -46,6 +46,10 @@ const Save = sequelize.define("Save", {
     allowNull: false,
     defaultValue: "[]",
   },
+  startTime: {
+    type: DataTypes.BIGINT,
+    allowNull: true,
+  },
 });
 
 export default Save;

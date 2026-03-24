@@ -100,10 +100,17 @@
           <div class="victory-banner">
             <h2>🏆 Victoire !</h2>
             <p>Vous avez triomphé de Sombrebois !</p>
+            <div class="victory-stats">
+              <span class="victory-stat">❤️ {{ gameStore.playerHp }} / {{ gameStore.playerMaxHp }} PV</span>
+              <span class="victory-stat">⏱️ {{ formattedTime }}</span>
+            </div>
           </div>
-          <button class="btn btn-gold" @click="gameStore.loadChapter(1)">
-            Recommencer l'aventure
-          </button>
+          <div class="victory-actions">
+            <RouterLink to="/leaderboard" class="btn btn-gold">🏆 Voir le classement</RouterLink>
+            <button class="btn btn-outline" @click="gameStore.loadChapter(1)">
+              Recommencer l'aventure
+            </button>
+          </div>
         </div>
 
         <!-- Défaite -->
@@ -131,6 +138,13 @@ import CombatPanel from '@/components/CombatPanel.vue'
 import Inventory from '@/components/Inventory.vue'
 
 const gameStore = useGameStore()
+
+const formattedTime = computed(() => {
+  const seconds = gameStore.getTimePlayed()
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+})
 
 const isLoggedIn = computed(() => {
   return localStorage.getItem('token') !== null
@@ -301,6 +315,26 @@ onMounted(() => {
 .victory-banner h2 {
   color: var(--color-success);
   font-size: 2rem;
+}
+
+.victory-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.victory-stat {
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  color: var(--color-gold);
+  letter-spacing: 1px;
+}
+
+.victory-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
 }
 
 .defeat-banner {
